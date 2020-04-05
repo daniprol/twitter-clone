@@ -16,11 +16,34 @@ app.get("/", (request, response) => {
   });
 });
 
+// Validation function:
+function isValidTweet(tweet) {
+  return (
+    tweet.name &&
+    tweet.name.toString().trim() !== "" &&
+    tweet.content &&
+    tweet.content.toString().trim() !== ""
+  );
+}
 // Let's create the post route!
 app.post("/tweets", (req, res) => {
-  console.log(req.method);
-  console.log(req.headers);
-  console.log(req.body);
+  //   console.log(req.method);
+  //   console.log(req.headers);
+  //   console.log(req.body);
+  // Add some server-side validation logic:
+  if (isValidTweet(req.body)) {
+    //insert into db
+    const tweet = {
+      name: req.body.name.toString(),
+      content: req.body.content.toString(),
+    };
+    console.log(tweet);
+  } else {
+    res.status(422);
+    res.json({
+      message: "Ey meu! Tes que poñer un nome e unha mensaxe",
+    });
+  }
 });
 // Running this will start a server in port 5000
 app.listen(5000, () => {
