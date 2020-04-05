@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.13.0/css/all.css"
+      integrity="sha384-Bfad6CLCknfcloXFOyFnlgtENryhrpZCe29RTifKEixXQZ38WheV+i/6YWSzkz3V"
+      crossorigin="anonymous"
+    />
+
+    <link
+      rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css"
       integrity="sha256-2YQRJMXD7pIAPHiXr0s+vlRWA7GYJEK0ARns7k2sbHY="
       crossorigin="anonymous"
@@ -18,9 +25,18 @@
     </header>
     <main>
       <form class="new-form">
-        <label for="name">Name</label>
+        <label for="name">Nome</label>
         <input type="text" id="name" name="name" class="u-full-width" />
+        <label for="content">Mensaxe</label>
+        <textarea type="text" id="content" name="content" class="u-full-width">
+        </textarea>
+        <button class="button-primary">Enviar mensaxe</button>
       </form>
+      <div class="loading">
+        <h5>Enviando mensaxe...</h5>
+        <i class="fas fa-circle-notch fa-spin fa-3x"></i>
+      </div>
     </main>
+    <script src="client.js"></script>
   </body>
 </html>
