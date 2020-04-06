@@ -1,6 +1,8 @@
 const express = require("express"); // Load the module
 const cors = require("cors");
 const monk = require("monk");
+const Filter = require("bad-words");
+
 // Create an application:
 const app = express();
 
@@ -9,6 +11,12 @@ const db = monk("localhost/ogrobe");
 
 // We get the collection we need or create it if it doesn't exist yet.
 const tweets = db.get("tweets");
+
+// Create a new filter:
+const filter = new Filter();
+const newBadWords = ["cona", "carallo", "foder"];
+
+filter.addWords(...newBadWords);
 
 // Any income request to the server is going to pass through this middleware (i.e., CORS) and add the headers
 app.use(cors());
@@ -48,8 +56,8 @@ app.post("/tweets", (req, res) => {
   if (isValidTweet(req.body)) {
     //insert into db
     const tweet = {
-      name: req.body.name.toString(),
-      content: req.body.content.toString(),
+      name: filter.clean(req.body.name.toString()),
+      content: filter.clean(req.body.content.toString()),
       created: new Date(),
     };
     // console.log(tweet);
