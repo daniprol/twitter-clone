@@ -1,7 +1,14 @@
 const express = require("express"); // Load the module
 const cors = require("cors");
+const monk = require("monk");
 // Create an application:
 const app = express();
+
+// The database will be hosted locally
+const db = monk("localhost/ogrobe");
+
+// We get the collection we need or create it if it doesn't exist yet.
+const tweets = db.get("tweets");
 
 // Any income request to the server is going to pass through this middleware (i.e., CORS) and add the headers
 app.use(cors());
@@ -13,6 +20,13 @@ app.use(express.json());
 app.get("/", (request, response) => {
   response.json({
     message: "Elo, meu? Hoooome",
+  });
+});
+
+// When we get the GET request /tweets, we need to respond with a query of the entire list of tweets:
+app.get("/tweets", (req, res) => {
+  tweets.find().then((tweets) => {
+    res.json(tweets);
   });
 });
 
@@ -36,8 +50,13 @@ app.post("/tweets", (req, res) => {
     const tweet = {
       name: req.body.name.toString(),
       content: req.body.content.toString(),
+      created: new Date(),
     };
-    console.log(tweet);
+    // console.log(tweet);
+
+    tweets.insert(tweet).then((createdTweet) => {
+      res.json(createdTweet);
+    });
   } else {
     res.status(422);
     res.json({

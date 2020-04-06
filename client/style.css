@@ -12,3 +12,13 @@
 textarea {
   resize: none;
 }
+
+.feed {
+  max-width: 500px;
+  margin: 30px auto;
+}
+
+.feed h5,
+.feed p {
+  margin-bottom: 5px;
+}
