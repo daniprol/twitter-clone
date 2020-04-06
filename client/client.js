@@ -1,11 +1,11 @@
 // Add event listener to the button:
 const form = document.querySelector("form");
-form.style.display = "none";
+// form.style.display = "none";
 // Select the feed element:
 const feedElement = document.querySelector(".feed");
 // Loading button:
 const loadingElement = document.querySelector(".loading");
-loadingElement.style.display = "";
+loadingElement.style.display = "none";
 
 // Add a variable to store the server to send the data to:
 const API_URL = "http://localhost:5000/tweets";
@@ -37,12 +37,13 @@ form.addEventListener("submit", (event) => {
     .then((response) => response.json())
     .then((createdTweet) => {
       console.log(createdTweet);
-
-      listAllTweets();
-      // Now hide the loading element:
       form.reset(); // Remember this!!!
-      loadingElement.style.display = "none";
-      form.style.display = "";
+      setTimeout(() => {
+        // Now hide the loading element:
+        loadingElement.style.display = "none";
+        form.style.display = "";
+      }, 30000);
+      listAllTweets();
     });
 });
 
@@ -77,7 +78,7 @@ function listAllTweets() {
 
         feedElement.appendChild(div);
       });
-      loadingElement.style.display = "none";
-      form.style.display = "";
+      //   loadingElement.style.display = "none";
+      //   form.style.display = "";
     });
 }

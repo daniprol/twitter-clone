@@ -2,7 +2,7 @@ const express = require("express"); // Load the module
 const cors = require("cors");
 const monk = require("monk");
 const Filter = require("bad-words");
-
+const rateLimit = require("express-rate-limit");
 // Create an application:
 const app = express();
 
@@ -23,6 +23,7 @@ app.use(cors());
 
 // Add a json body parser from the express module. Otherwise the content of the POST request will be shown as undefined!!
 app.use(express.json());
+// DO NOT PLACE THE RATELIMT HERE OR IT WILL COUNT THE PAGE LOADING AS A REQUEST!
 
 // Add event listener to the GET request to the slash route:
 app.get("/", (request, response) => {
@@ -37,6 +38,13 @@ app.get("/tweets", (req, res) => {
     res.json(tweets);
   });
 });
+
+app.use(
+  rateLimit({
+    windowMs: 20 * 1000, // 1 request every 20 seconds
+    max: 1,
+  })
+);
 
 // Validation function:
 function isValidTweet(tweet) {
