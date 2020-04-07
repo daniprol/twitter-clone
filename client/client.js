@@ -75,7 +75,7 @@ function listAllTweets() {
         div.appendChild(header);
         div.appendChild(contents);
         div.appendChild(date);
-
+        div.classList.add("tweet");
         feedElement.appendChild(div);
       });
       //   loadingElement.style.display = "none";
