@@ -34,12 +34,52 @@ app.get("/", (request, response) => {
 });
 
 // When we get the GET request /tweets, we need to respond with a query of the entire list of tweets:
-app.get("/tweets", (req, res) => {
-  tweets.find().then((tweets) => {
-    res.json(tweets);
-  });
+app.get("/tweets", (req, res, next) => {
+  tweets
+    .find()
+    .then((tweets) => {
+      res.json(tweets);
+    })
+    .catch(next);
 });
 
+// New endpoint to build the pagination:
+app.get("/v2/tweets", (req, res, next) => {
+  console.log(req.query);
+  // If the query has a skip parameter, use it. Otherwise set it to 0.
+  //   let skip = Number(req.query.skip) || 0;
+  //   let limit = Number(req.query.limit) || 10;
+
+  // We can also destructure the query:
+  let { skip = 0, limit = 10, sort = "desc" } = req.query;
+  // If  we use this we need to change the strings to number!
+  //   skip = isNaN(skip) ? 0 : Number(skip);
+  //   limit = isNaN(limit) ? 10 : Number(limit);
+  skip = Number(skip) || 0;
+  limit = Number(limit) || 10;
+  limit = limit > 50 ? 50 : limit;
+
+  Promise.all([
+    tweets.count(),
+    tweets.find(
+      {},
+      {
+        skip,
+        limit,
+        sort: {
+          created: sort === "desc" ? -1 : 1,
+        },
+      }
+    ),
+  ])
+    .then(([total, tweets]) => {
+      res.json({
+        tweets,
+        meta: { total, skip, limit, hasMore: total - (skip + limit) > 0 },
+      });
+    })
+    .catch(next);
+});
 app.use(
   rateLimit({
     windowMs: 20 * 1000, // 1 request every 20 seconds
