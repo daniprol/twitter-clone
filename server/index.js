@@ -7,7 +7,7 @@ const rateLimit = require("express-rate-limit");
 const app = express();
 
 // The database will be hosted locally
-const db = monk("localhost/ogrobe");
+const db = monk(process.env.MONGO_URI || "localhost/ogrobe");
 
 // We get the collection we need or create it if it doesn't exist yet.
 const tweets = db.get("tweets");
