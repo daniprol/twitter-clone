@@ -6,9 +6,18 @@ const feedElement = document.querySelector(".feed");
 // Loading button:
 const loadingElement = document.querySelector(".loading");
 loadingElement.style.display = "none";
-
+const loadMoreButton = document.getElementById("loadMoreButton");
 // Add a variable to store the server to send the data to:
-const API_URL = "http://localhost:5000/tweets";
+const API_URL =
+  window.location.hostname === "127.0.0.1"
+    ? "http://localhost:5000/v2/tweets/"
+    : "https://ogrobe-api.now.sh/v2/tweets";
+
+// Define global variables:
+let skip = 0;
+let limit = 5;
+
+loadMoreButton.addEventListener("click", loadMore);
 
 listAllTweets();
 
@@ -47,21 +56,29 @@ form.addEventListener("submit", (event) => {
     });
 });
 
-function listAllTweets() {
+function loadMore() {
+  // We need to increase the skip by the limit and then load the new tweets:
+  skip += limit;
+  listAllTweets(false);
+}
+
+function listAllTweets(reset = true) {
   // Before listing all the tweets we need to clear all the feed so we don't get duplicates when we submit something:
-  feedElement.innerHTML = "";
+  if (reset) {
+    feedElement.innerHTML = "";
+    skip = 0;
+  }
 
   // With GET requests you don't need to specify any headers or options!
   // Always remember to parse the respond as JSON!
-  fetch(API_URL)
+  fetch(`${API_URL}?skip=${skip}&limit=${limit}`)
     .then((response) => response.json())
-    .then((tweets) => {
-      console.log(tweets);
-
+    .then((result) => {
+      console.log(result);
       // If you want to show the messages in reverse order (i.e., latest messages first)
       //   tweets.reverse();
 
-      tweets.forEach((tweet) => {
+      result.tweets.forEach((tweet) => {
         const div = document.createElement("div");
         const header = document.createElement("h5");
         header.textContent = tweet.name + ":";
@@ -80,5 +97,10 @@ function listAllTweets() {
       });
       //   loadingElement.style.display = "none";
       //   form.style.display = "";
+      if (result.meta.hasMore) {
+        loadMoreButton.style.visibility = "visible";
+      } else {
+        loadMoreButton.style.visibility = "hidden";
+      }
     });
 }

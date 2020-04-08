@@ -5,7 +5,6 @@ const Filter = require("bad-words");
 const rateLimit = require("express-rate-limit");
 // Create an application:
 const app = express();
-
 // The database will be hosted locally
 const db = monk(process.env.MONGO_URI || "localhost/ogrobe");
 // const db = monk(process.env.MONGO_URI);
@@ -51,14 +50,15 @@ app.get("/v2/tweets", (req, res, next) => {
   //   let limit = Number(req.query.limit) || 10;
 
   // We can also destructure the query:
-  let { skip = 0, limit = 10, sort = "desc" } = req.query;
+  let { skip = 0, limit = 5, sort = "desc" } = req.query;
   // If  we use this we need to change the strings to number!
   //   skip = isNaN(skip) ? 0 : Number(skip);
   //   limit = isNaN(limit) ? 10 : Number(limit);
-  skip = Number(skip) || 0;
-  limit = Number(limit) || 10;
-  limit = limit > 50 ? 50 : limit;
+  skip = parseInt(skip) || 0;
+  limit = parseInt(limit) || 5;
 
+  skip = skip < 0 ? 0 : skip;
+  limit = Math.min(50, Math.max(1, limit));
   Promise.all([
     tweets.count(),
     tweets.find(
@@ -96,8 +96,8 @@ function isValidTweet(tweet) {
     tweet.content.toString().trim() !== ""
   );
 }
-// Let's create the post route!
-app.post("/tweets", (req, res) => {
+
+const createTweet = (req, res) => {
   //   console.log(req.method);
   //   console.log(req.headers);
   //   console.log(req.body);
@@ -120,7 +120,11 @@ app.post("/tweets", (req, res) => {
       message: "Ey meu! Tes que poñer un nome e unha mensaxe",
     });
   }
-});
+};
+
+// Let's create the post route!
+app.post("/tweets", createTweet);
+app.post("/v2/tweets", createTweet);
 // Running this will start a server in port 5000
 app.listen(5000, () => {
   console.log("Listening on http://localhost:5000");
