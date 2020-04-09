@@ -6,7 +6,7 @@ const feedElement = document.querySelector(".feed");
 // Loading button:
 const loadingElement = document.querySelector(".loading");
 loadingElement.style.display = "none";
-const loadMoreButton = document.getElementById("loadMoreButton");
+const loadMore = document.getElementById("loadMore");
 // Add a variable to store the server to send the data to:
 const API_URL =
   window.location.hostname === "127.0.0.1"
@@ -16,8 +16,28 @@ const API_URL =
 // Define global variables:
 let skip = 0;
 let limit = 5;
+let loading = false;
+let finished = false;
 
-loadMoreButton.addEventListener("click", loadMore);
+document.addEventListener("scroll", () => {
+  //   console.log("scrolling...");
+  const rect = loadMore.getBoundingClientRect();
+  setTimeout(() => {
+    if (rect.top < window.innerHeight && !loading && !finished) {
+      loadMoreTweets();
+    }
+  }, 2000);
+  // Alternative:
+  //   const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+  // scrollTop
+  // clientHeight: how tall is the screen
+  // scrollHeight: how much scroll has the entire page
+  // ScrollTop: scrolling level at the top of the screen RIGHT NOW
+  //   if (scrollTop + clientHeight >= scrollHeight - 5) {
+  // console.log("Now");
+  // showLoading();
+  //   }
+});
 
 listAllTweets();
 
@@ -56,7 +76,7 @@ form.addEventListener("submit", (event) => {
     });
 });
 
-function loadMore() {
+function loadMoreTweets() {
   // We need to increase the skip by the limit and then load the new tweets:
   skip += limit;
   listAllTweets(false);
@@ -68,7 +88,7 @@ function listAllTweets(reset = true) {
     feedElement.innerHTML = "";
     skip = 0;
   }
-
+  loading = true;
   // With GET requests you don't need to specify any headers or options!
   // Always remember to parse the respond as JSON!
   fetch(`${API_URL}?skip=${skip}&limit=${limit}`)
@@ -98,9 +118,11 @@ function listAllTweets(reset = true) {
       //   loadingElement.style.display = "none";
       //   form.style.display = "";
       if (result.meta.hasMore) {
-        loadMoreButton.style.visibility = "visible";
+        loadMore.style.visibility = "visible";
       } else {
-        loadMoreButton.style.visibility = "hidden";
+        loadMore.style.visibility = "hidden";
+        finished = true;
       }
+      loading = false;
     });
 }
