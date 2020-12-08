@@ -1,4 +1,4 @@
-# Full Stack Twitter Clone (by Coding Garden)
+# Full Stack Twitter Clone
 
 ### Structure
 
